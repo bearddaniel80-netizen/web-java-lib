@@ -6,6 +6,7 @@ val lombokVersion     = "1.18.34"
 val minioVersion      = "8.5.17"
 
 lazy val root = (project in file("."))
+  .enablePlugins(JavaAppPackaging)
   .settings(
     name := "aql", // set to your project name
 
@@ -13,7 +14,11 @@ lazy val root = (project in file("."))
     autoScalaLibrary := false,
     crossPaths       := false,
 
-    javacOptions ++= Seq("--release", "21"),
+    // -parameters is needed for Spring MVC; the Gradle/Maven Boot plugins add it automatically
+    javacOptions ++= Seq("--release", "21", "-parameters"),
+
+    // set explicitly so the launcher script knows what to run
+    Compile / mainClass := Some("example.Application"),
 
     libraryDependencies ++= Seq(
       "org.springframework.boot" % "spring-boot-starter-web"        % springBootVersion,
