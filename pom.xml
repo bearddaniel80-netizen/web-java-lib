@@ -11,8 +11,8 @@
         <relativePath/>
     </parent>
 
-    <groupId>aql</groupId>
-    <artifactId>demo</artifactId>
+    <groupId>demo</groupId>
+    <artifactId>aql</artifactId>
     <version>0.0.1</version>
 
     <properties>
