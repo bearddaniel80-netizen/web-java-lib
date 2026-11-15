@@ -1,4 +1,4 @@
-ThisBuild / organization := "com.example"
+ThisBuild / organization := "example"
 ThisBuild / version      := "0.0.1"
 
 val springBootVersion = "3.5.7"
@@ -7,7 +7,7 @@ val minioVersion      = "8.5.17"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "my-app", // set to your project name
+    name := "aql", // set to your project name
 
     // Pure Java project: no Scala library, no _2.13 suffix on artifacts
     autoScalaLibrary := false,
