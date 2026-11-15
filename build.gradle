@@ -12,6 +12,10 @@ ext {
 group = 'example'
 version = '0.0.1'
 
+bootJar {
+    archiveFileName = 'aql.jar'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
