@@ -19,7 +19,7 @@ lazy val root = (project in file("."))
 
     // don't build javadoc or source jars as part of packaging
     Compile / doc / sources                := Seq.empty,
-    Compile / packageDoc / publishArtifact := false    
+    Compile / packageDoc / publishArtifact := false,
 
     // set explicitly so the launcher script knows what to run
     Compile / mainClass := Some("example.Application"),
