@@ -1,7 +1,7 @@
 <project name="aql" default="jar" basedir="."
          xmlns:ivy="antlib:org.apache.ivy.ant">
 
-    <property name="group"          value="example"/>
+    <property name="group"          value="aql"/>
     <property name="version"        value="0.0.1"/>
     <property name="java.release"   value="21"/>
 
