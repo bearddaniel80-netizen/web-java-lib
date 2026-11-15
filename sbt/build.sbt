@@ -17,6 +17,10 @@ lazy val root = (project in file("."))
     // -parameters is needed for Spring MVC; the Gradle/Maven Boot plugins add it automatically
     javacOptions ++= Seq("--release", "21"),
 
+    // don't build javadoc or source jars as part of packaging
+    Compile / doc / sources                := Seq.empty,
+    Compile / packageDoc / publishArtifact := false    
+
     // set explicitly so the launcher script knows what to run
     Compile / mainClass := Some("example.Application"),
 
