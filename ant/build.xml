@@ -87,14 +87,16 @@
             </testclasses>
         </junitlauncher>
     </target>
-<target name="dist" depends="jar">
-    <mkdir dir="${build.dir}/dist/lib"/>
-    <!-- runtime.path excludes Lombok (provided) and test jars -->
-    <copy todir="${build.dir}/dist/lib" flatten="true">
-        <path refid="runtime.path"/>
-    </copy>
-    <copy file="${build.dir}/${ant.project.name}-${version}.jar" todir="${build.dir}/dist"/>
-</target>
+
+    <target name="dist" depends="jar">
+        <mkdir dir="${build.dir}/dist/lib"/>
+        <!-- runtime.path excludes Lombok (provided) and test jars -->
+        <copy todir="${build.dir}/dist/lib" flatten="true">
+            <path refid="runtime.path"/>
+        </copy>
+        <copy file="${build.dir}/${ant.project.name}-${version}.jar" todir="${build.dir}/dist"/>
+    </target>
+
     <target name="jar" depends="compile">
         <jar destfile="${build.dir}/${ant.project.name}-${version}.jar" basedir="${classes.dir}"/>
     </target>

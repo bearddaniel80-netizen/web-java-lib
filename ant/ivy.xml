@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="aql" module="example" revision="0.0.1"/>
+    <info organisation="example" module="aql" revision="0.0.1"/>
 
     <configurations>
         <conf name="compile"/>
