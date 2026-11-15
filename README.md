@@ -7,7 +7,7 @@ A shared kernal / library for aql web projects.
 From a Dockerfile:
 
 ```text
-RUN git clone -b <BRANCH> <THIS GITHUB REPO>
+RUN git clone -b --single-branch <BRANCH> <THIS GITHUB REPO>
 ```
 
 ### Branch
@@ -20,6 +20,9 @@ RUN git clone -b <BRANCH> <THIS GITHUB REPO>
 
 - build
     - build.gradle
+    - pom.xml
+    - ant / ivy.xml
+    - ant / build.xml
 
 - BFF
     - resources / application.yml
