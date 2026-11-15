@@ -1,7 +1,7 @@
 <project name="aql" default="jar" basedir="."
          xmlns:ivy="antlib:org.apache.ivy.ant">
 
-    <property name="group"          value="com.example"/>
+    <property name="group"          value="example"/>
     <property name="version"        value="0.0.1"/>
     <property name="java.release"   value="21"/>
 
@@ -87,7 +87,14 @@
             </testclasses>
         </junitlauncher>
     </target>
-
+<target name="dist" depends="jar">
+    <mkdir dir="${build.dir}/dist/lib"/>
+    <!-- runtime.path excludes Lombok (provided) and test jars -->
+    <copy todir="${build.dir}/dist/lib" flatten="true">
+        <path refid="runtime.path"/>
+    </copy>
+    <copy file="${build.dir}/${ant.project.name}-${version}.jar" todir="${build.dir}/dist"/>
+</target>
     <target name="jar" depends="compile">
         <jar destfile="${build.dir}/${ant.project.name}-${version}.jar" basedir="${classes.dir}"/>
     </target>
