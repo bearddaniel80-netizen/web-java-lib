@@ -15,7 +15,7 @@ lazy val root = (project in file("."))
     crossPaths       := false,
 
     // -parameters is needed for Spring MVC; the Gradle/Maven Boot plugins add it automatically
-    javacOptions ++= Seq("--release", "21", "-parameters"),
+    javacOptions ++= Seq("--release", "21"),
 
     // set explicitly so the launcher script knows what to run
     Compile / mainClass := Some("example.Application"),
