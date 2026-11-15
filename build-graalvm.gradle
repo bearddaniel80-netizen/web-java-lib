@@ -40,7 +40,7 @@ tasks.named('test') {
 graalvmNative {
     binaries {
         main {
-            imageName = 'app'
+            imageName = 'aql'
             buildArgs.add('-O2')
             // Uncomment if you hit reflection/resource errors at runtime:
             // buildArgs.add('--initialize-at-build-time=')
