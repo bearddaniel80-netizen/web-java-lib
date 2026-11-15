@@ -23,6 +23,9 @@ RUN git clone -b --single-branch <BRANCH> <THIS GITHUB REPO>
     - pom.xml
     - ant / ivy.xml
     - ant / build.xml
+    - sbt / build.sbt
+    - sbt / project / build.properties
+    - sbt / project / plugins.sbt
 
 - BFF
     - resources / application.yml
