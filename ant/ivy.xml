@@ -1,0 +1,23 @@
+<ivy-module version="2.0">
+    <info organisation="example" module="aql" revision="0.0.1"/>
+
+    <configurations>
+        <conf name="compile"/>
+        <conf name="provided"/>
+        <conf name="runtime" extends="compile"/>
+        <conf name="test"    extends="runtime"/>
+    </configurations>
+
+    <dependencies>
+        <dependency org="org.springframework.boot" name="spring-boot-starter-web"        rev="3.5.7"  conf="compile->default"/>
+        <dependency org="org.springframework.boot" name="spring-boot-starter-validation" rev="3.5.7"  conf="compile->default"/>
+        <dependency org="io.minio"                 name="minio"                          rev="8.5.17" conf="compile->default"/>
+
+        <!-- compileOnly + annotationProcessor -->
+        <dependency org="org.projectlombok"        name="lombok"                         rev="1.18.34" conf="provided->default"/>
+
+        <dependency org="org.springframework.boot" name="spring-boot-starter-test"       rev="3.5.7"  conf="test->default"/>
+        <!-- needed by Ant's <junitlauncher>; keep in line with the JUnit version in starter-test -->
+        <dependency org="org.junit.platform"       name="junit-platform-launcher"        rev="1.12.2" conf="test->default"/>
+    </dependencies>
+</ivy-module>

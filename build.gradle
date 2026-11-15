@@ -9,7 +9,7 @@ ext {
     minioVersion = '8.5.17'
 }
 
-group = 'com.example'
+group = 'example'
 version = '0.0.1'
 
 java {
