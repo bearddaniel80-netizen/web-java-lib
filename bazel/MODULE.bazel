@@ -1,0 +1,38 @@
+module(
+    name = "example_app",
+    version = "0.0.1",
+)
+
+bazel_dep(name = "rules_java", version = "8.6.1")
+bazel_dep(name = "rules_jvm_external", version = "6.6")
+bazel_dep(name = "contrib_rules_jvm", version = "0.27.0")
+
+SPRING_BOOT_VERSION = "3.5.7"
+LOMBOK_VERSION = "1.18.34"
+MINIO_VERSION = "8.5.17"
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    artifacts = [
+        # implementation
+        "org.springframework.boot:spring-boot-starter-web",
+        "org.springframework.boot:spring-boot-starter-validation",
+        "io.minio:minio:" + MINIO_VERSION,
+        # compileOnly + annotationProcessor
+        "org.projectlombok:lombok:" + LOMBOK_VERSION,
+        # testImplementation
+        "org.springframework.boot:spring-boot-starter-test",
+        # JUnit 5 runtime for Bazel's test runner
+        "org.junit.jupiter:junit-jupiter-engine",
+        "org.junit.platform:junit-platform-launcher",
+        "org.junit.platform:junit-platform-reporting",
+    ],
+    # Replaces io.spring.dependency-management: versions come from the Boot BOM
+    boms = [
+        "org.springframework.boot:spring-boot-dependencies:" + SPRING_BOOT_VERSION,
+    ],
+    fetch_sources = True,
+    lock_file = "//:maven_install.json",
+    repositories = ["https://repo1.maven.org/maven2"],
+)
+use_repo(maven, "maven")

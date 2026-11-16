@@ -1,0 +1,37 @@
+package build
+
+import mill.*, javalib.*
+
+object `package` extends MavenModule {
+  def jvmVersion = "temurin:21"
+
+  // Replaces the io.spring.dependency-management plugin: versions come from the Boot BOM
+  def bomMvnDeps = Seq(
+    mvn"org.springframework.boot:spring-boot-dependencies:3.5.7"
+  )
+
+  def mvnDeps = Seq(
+    mvn"org.springframework.boot:spring-boot-starter-web",
+    mvn"org.springframework.boot:spring-boot-starter-validation",
+    mvn"io.minio:minio:8.5.17",
+    mvn"org.projectlombok:lombok:1.18.34"
+  )
+
+  // Lombok as an annotation processor (replaces annotationProcessor)
+  def annotationProcessorsMvnDeps = Seq(
+    mvn"org.projectlombok:lombok:1.18.34"
+  )
+
+  // Spring needs parameter names preserved for some features
+  def javacOptions = super.javacOptions() ++ Seq("-parameters")
+
+  object test extends MavenTests, TestModule.Junit5 {
+    def bomMvnDeps = Seq(
+      mvn"org.springframework.boot:spring-boot-dependencies:3.5.7"
+    )
+    def mvnDeps = Seq(
+      mvn"org.springframework.boot:spring-boot-starter-test",
+      mvn"org.junit.jupiter:junit-jupiter"
+    )
+  }
+}

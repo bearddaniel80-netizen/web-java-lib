@@ -1,0 +1,98 @@
+load("@rules_graalvm//graalvm:defs.bzl", "native_image")
+load("@rules_java//java:defs.bzl", "java_binary", "java_import", "java_library", "java_plugin")
+load("@rules_spring//springboot:springboot.bzl", "springboot")
+
+MAIN_CLASS = "example.Application"
+
+SPRING_DEPS = [
+    "@maven//:org_springframework_boot_spring_boot_starter_web",
+    "@maven//:org_springframework_boot_spring_boot_starter_validation",
+    "@maven//:io_minio_minio",
+]
+
+# ---- Lombok (compileOnly + annotationProcessor) ----
+java_plugin(
+    name = "lombok_plugin",
+    generates_api = True,
+    processor_class = "lombok.launch.AnnotationProcessorHider$AnnotationProcessor",
+    deps = ["@maven//:org_projectlombok_lombok"],
+)
+
+java_library(
+    name = "lombok",
+    exported_plugins = [":lombok_plugin"],
+    exports = ["@maven//:org_projectlombok_lombok"],
+    neverlink = True,
+)
+
+# ---- Application code (src/main/java + src/main/resources) ----
+java_library(
+    name = "app_lib",
+    srcs = glob(["src/main/java/**/*.java"]),
+    resources = glob(["src/main/resources/**"]),
+    resource_strip_prefix = "src/main/resources",
+    visibility = ["//visibility:public"],
+    deps = SPRING_DEPS + [":lombok"],
+)
+
+# ---- JVM executable jar (Gradle: bootJar) ----
+springboot(
+    name = "aql",
+    boot_app_class = MAIN_CLASS,
+    boot_launcher_class = "org.springframework.boot.loader.launch.JarLauncher",  # Boot 3.2+
+    java_library = ":app_lib",
+)
+
+# ---- Spring AOT (Gradle: processAot, runs automatically there) ----
+# Bazel has no built-in Spring AOT step, so we run Spring's processor ourselves.
+java_binary(
+    name = "aot_processor",
+    main_class = "org.springframework.boot.SpringApplicationAotProcessor",
+    runtime_deps = [":app_lib"],
+)
+
+# Args: <main class> <sourceOutput> <resourceOutput> <classOutput> <groupId> <artifactId>
+genrule(
+    name = "aot",
+    outs = [
+        "aot_sources.srcjar",
+        "aot_classes.jar",
+    ],
+    cmd = """
+set -euo pipefail
+SRC=$$(mktemp -d); RES=$$(mktemp -d); CLS=$$(mktemp -d)
+$(location :aot_processor) %s $$SRC $$RES $$CLS example aql
+$(JAVABASE)/bin/jar cf $(location aot_sources.srcjar) -C $$SRC .
+$(JAVABASE)/bin/jar cf $(location aot_classes.jar) -C $$RES . -C $$CLS .
+""" % MAIN_CLASS,
+    toolchains = ["@rules_java//toolchains:current_java_runtime"],
+    tools = [":aot_processor"],
+)
+
+java_library(
+    name = "aot_lib",
+    srcs = [":aot_sources.srcjar"],
+    deps = SPRING_DEPS + [":app_lib"],
+)
+
+# AOT-generated proxy classes + META-INF/native-image hints
+java_import(
+    name = "aot_classes",
+    jars = [":aot_classes.jar"],
+)
+
+# ---- GraalVM native image (Gradle: nativeCompile) ----
+native_image(
+    name = "aql_native",
+    executable_name = "aql",
+    extra_args = [
+        "--no-fallback",
+        "-O2",
+    ],
+    main_class = MAIN_CLASS,
+    deps = [
+        ":aot_classes",
+        ":aot_lib",
+        ":app_lib",
+    ] + SPRING_DEPS,
+)

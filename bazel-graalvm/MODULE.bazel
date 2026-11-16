@@ -1,0 +1,51 @@
+module(
+    name = "aql",
+    version = "0.0.1",
+)
+
+# ---- Gradle `ext { ... }` equivalents ----
+LOMBOK_VERSION = "1.18.34"
+MINIO_VERSION = "8.5.17"
+SPRING_BOOT_VERSION = "3.5.7"
+
+# ---- Rules ----
+bazel_dep(name = "rules_java", version = "9.1.0")
+bazel_dep(name = "rules_jvm_external", version = "6.6")
+bazel_dep(name = "rules_spring", version = "2.6.3")
+bazel_dep(name = "rules_graalvm", version = "0.12.0")
+
+# ---- GraalVM JDK 21 (toolchain + native-image) ----
+gvm = use_extension("@rules_graalvm//:extensions.bzl", "graalvm")
+gvm.graalvm(
+    name = "graalvm",
+    distribution = "ce",
+    java_version = "21",
+    version = "21.0.2",
+)
+use_repo(gvm, "graalvm")
+
+register_toolchains("@graalvm//:jvm")
+register_toolchains("@graalvm//:sdk")
+
+# ---- Maven dependencies (Gradle `dependencies { ... }`) ----
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    name = "maven",
+    # Equivalent of the io.spring.dependency-management plugin:
+    # unversioned artifacts below take their versions from the Boot BOM.
+    boms = ["org.springframework.boot:spring-boot-dependencies:" + SPRING_BOOT_VERSION],
+    artifacts = [
+        "org.springframework.boot:spring-boot-starter-web",
+        "org.springframework.boot:spring-boot-starter-validation",
+        "io.minio:minio:" + MINIO_VERSION,
+        "org.projectlombok:lombok:" + LOMBOK_VERSION,
+        # Needed by the springboot() fat-jar rule (Boot 3 launcher)
+        "org.springframework.boot:spring-boot-loader",
+    ],
+    repositories = ["https://repo1.maven.org/maven2"],
+    fetch_sources = True,
+    # After first build, pin with: REPIN=1 bazel run @maven//:pin
+    # then uncomment:
+    # lock_file = "//:maven_install.json",
+)
+use_repo(maven, "maven")

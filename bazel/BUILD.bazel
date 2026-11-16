@@ -1,0 +1,61 @@
+load("@contrib_rules_jvm//java:defs.bzl", "java_junit5_test")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library", "java_plugin")
+
+package(default_visibility = ["//visibility:public"])
+
+# ---- Lombok (compileOnly + annotationProcessor) ----
+java_plugin(
+    name = "lombok_plugin",
+    processor_class = "lombok.launch.AnnotationProcessorHider$AnnotationProcessor",
+    deps = ["@maven//:org_projectlombok_lombok"],
+)
+
+java_library(
+    name = "lombok",
+    exported_plugins = [":lombok_plugin"],
+    neverlink = True,  # compile-time only, like compileOnly
+    exports = ["@maven//:org_projectlombok_lombok"],
+)
+
+# ---- Main app ----
+java_library(
+    name = "app_lib",
+    srcs = glob(["src/main/java/**/*.java"]),
+    resources = glob(["src/main/resources/**"]),
+    resource_strip_prefix = "src/main/resources",
+    # Spring Boot's Gradle plugin passes -parameters by default
+    javacopts = ["-parameters"],
+    deps = [
+        ":lombok",
+        "@maven//:io_minio_minio",
+        "@maven//:org_springframework_boot_spring_boot_starter_validation",
+        "@maven//:org_springframework_boot_spring_boot_starter_web",
+    ],
+)
+
+java_binary(
+    name = "app",
+    main_class = "example.Application",  # <- change to your @SpringBootApplication class
+    runtime_deps = [":app_lib"],
+)
+
+# ---- Tests ----
+java_junit5_test(
+    name = "app_test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    resources = glob(["src/test/resources/**"]),
+    resource_strip_prefix = "src/test/resources",
+    javacopts = ["-parameters"],
+    # test_class or includes = ["Test"] picks the classes to run
+    include_packages = ["example"],
+    runtime_deps = [
+        "@maven//:org_junit_jupiter_junit_jupiter_engine",
+        "@maven//:org_junit_platform_junit_platform_launcher",
+        "@maven//:org_junit_platform_junit_platform_reporting",
+    ],
+    deps = [
+        ":app_lib",
+        ":lombok",
+        "@maven//:org_springframework_boot_spring_boot_starter_test",
+    ],
+)
