@@ -11,7 +11,7 @@ ext {
     minioVersion = '8.5.17'
 }
 
-group = 'example'
+group = 'aql'
 version = '0.0.1'
 
 java {
